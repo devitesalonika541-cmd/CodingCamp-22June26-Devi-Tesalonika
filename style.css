@@ -1,0 +1,812 @@
+/* ==========================================================================
+   Expense & Budget Visualizer — style.css
+   Requirements: 2.2 (scrollable transaction list), 4.5 (perceptual chart colors)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS Custom Properties
+   -------------------------------------------------------------------------- */
+:root {
+  /* Brand colors */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-success-bg: #16a34a;
+  --color-error-bg: #dc2626;
+
+  /* Category chart colors — contrast ratio ≥ 3:1 between each pair */
+  --color-category-food:      #e74c3c; /* red   */
+  --color-category-transport: #2980b9; /* blue  (darker shade of #3498db for better contrast) */
+  --color-category-fun:       #27ae60; /* green (darker shade of #2ecc71 for better contrast) */
+
+  /* Neutrals */
+  --color-bg:          #f1f5f9;
+  --color-surface:     #ffffff;
+  --color-border:      #e2e8f0;
+  --color-text:        #1e293b;
+  --color-text-muted:  #64748b;
+  --color-text-error:  #dc2626;
+
+  /* Header */
+  --header-height: 72px;
+
+  /* Spacing */
+  --spacing-xs:  4px;
+  --spacing-sm:  8px;
+  --spacing-md:  16px;
+  --spacing-lg:  24px;
+  --spacing-xl:  32px;
+
+  /* Radius */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   Reset & Base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   App Header — sticky, Balance_Display selalu terlihat (Requirement 3.5)
+   -------------------------------------------------------------------------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: 0 var(--spacing-xl);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Balance_Display — top of page, always visible */
+.balance-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.balance-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.balance-amount {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   Main Content
+   -------------------------------------------------------------------------- */
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+/* --------------------------------------------------------------------------
+   Section titles
+   -------------------------------------------------------------------------- */
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+/* --------------------------------------------------------------------------
+   Form Section
+   -------------------------------------------------------------------------- */
+.form-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+.expense-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--spacing-md);
+  align-items: end;
+}
+
+/* Each label + input/select + error block */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.9375rem;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  appearance: auto;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid {
+  border-color: var(--color-text-error);
+}
+
+/* Inline validation error — below field (Requirement 1.3 / 1.4) */
+.field-error {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-error);
+  min-height: 1rem; /* reserve space to avoid layout shift */
+  line-height: 1.2;
+}
+
+.field-error:empty {
+  display: none;
+}
+
+/* Submit button */
+.btn-submit {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast),
+              box-shadow var(--transition-fast);
+  white-space: nowrap;
+  align-self: flex-end;
+}
+
+.btn-submit:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-submit:active {
+  transform: scale(0.98);
+}
+
+.btn-submit:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.4);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Content Grid — transaction list + chart side by side
+   -------------------------------------------------------------------------- */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  align-items: start;
+}
+
+/* --------------------------------------------------------------------------
+   Transaction List (Requirement 2.2 — scroll vertikal)
+   -------------------------------------------------------------------------- */
+.list-section,
+.chart-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Scrollable container with fixed height — Requirement 2.2 */
+.transaction-list-container {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar (WebKit) */
+.transaction-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+.transaction-list-container::-webkit-scrollbar-track {
+  background: var(--color-bg);
+  border-radius: 3px;
+}
+.transaction-list-container::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+.transaction-list-container::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Transaction list <ul> */
+.transaction-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+/* Each transaction item */
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  transition: background-color var(--transition-fast);
+}
+
+.transaction-item:hover {
+  background-color: #e8edf5;
+}
+
+.transaction-item .item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.transaction-item .item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.transaction-item .item-meta {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.transaction-item .item-amount {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Category badge */
+.transaction-item .item-category {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: #ffffff;
+}
+
+.item-category[data-category="Food"] {
+  background-color: var(--color-category-food);
+}
+
+.item-category[data-category="Transport"] {
+  background-color: var(--color-category-transport);
+}
+
+.item-category[data-category="Fun"] {
+  background-color: var(--color-category-fun);
+}
+
+/* Delete button */
+.btn-delete {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-danger);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast),
+              border-color var(--transition-fast);
+}
+
+.btn-delete:hover {
+  color: #ffffff;
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn-delete:active {
+  background-color: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+}
+
+.btn-delete:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.35);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Chart Section (Requirement 4.5 — perceptual colors)
+   -------------------------------------------------------------------------- */
+.chart-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.chart-container canvas {
+  max-width: 100%;
+  max-height: 320px;
+}
+
+.chart-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  text-align: center;
+  padding: var(--spacing-lg);
+}
+
+/* Hide placeholder when chart is active */
+.chart-placeholder:empty {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Toast Notification (Requirement — toast positioning + fade transition)
+   -------------------------------------------------------------------------- */
+.notification-container {
+  position: fixed;
+  top: calc(var(--header-height) + var(--spacing-md));
+  right: var(--spacing-lg);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  pointer-events: none;
+  max-width: 360px;
+  width: calc(100% - var(--spacing-lg) * 2);
+}
+
+/* Base toast */
+.toast {
+  pointer-events: auto;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ffffff;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 250ms ease, transform 250ms ease;
+  word-break: break-word;
+}
+
+/* Visible state — triggered by adding .show class in JS */
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Fade-out state — triggered by removing .show before removal */
+.toast.hide {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+/* Variants */
+.toast-success {
+  background-color: var(--color-success-bg);
+}
+
+.toast-error {
+  background-color: var(--color-error-bg);
+}
+
+.toast-info {
+  background-color: var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Dark mode — [data-theme="dark"] on <html>
+   -------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  --color-primary:        #60a5fa;
+  --color-primary-hover:  #93c5fd;
+  --color-bg:             #0f172a;
+  --color-surface:        #1e293b;
+  --color-border:         #334155;
+  --color-text:           #f1f5f9;
+  --color-text-muted:     #94a3b8;
+  --color-text-error:     #f87171;
+  --color-danger:         #f87171;
+  --color-danger-hover:   #fca5a5;
+  --color-success-bg:     #16a34a;
+  --color-error-bg:       #dc2626;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .transaction-item:hover {
+  background-color: #263348;
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .sort-select,
+[data-theme="dark"] .category-add-row input {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus {
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
+}
+
+/* Theme toggle button */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.btn-icon:hover {
+  background-color: var(--color-border);
+}
+
+/* Show sun in dark mode, moon in light mode */
+.icon-moon { display: none; }
+.icon-sun  { display: inline; }
+
+[data-theme="dark"] .icon-sun  { display: none; }
+[data-theme="dark"] .icon-moon { display: inline; }
+
+/* Header controls group */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Sort controls — above transaction list
+   -------------------------------------------------------------------------- */
+.list-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.list-section-header .section-title {
+  margin-bottom: 0;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.sort-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.sort-select {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.sort-select:focus {
+  border-color: var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Category Manager
+   -------------------------------------------------------------------------- */
+.category-manager {
+  margin-top: var(--spacing-md);
+}
+
+.btn-manage-categories {
+  background: none;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-manage-categories:hover {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.category-panel {
+  margin-top: var(--spacing-sm);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-md);
+}
+
+.category-add-row {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.category-add-row input {
+  flex: 1;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.category-add-row input:focus {
+  border-color: var(--color-primary);
+}
+
+.btn-add-category {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-add-category:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.category-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+.category-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.category-item-name {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.btn-delete-category {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  line-height: 1;
+}
+
+.btn-delete-category:hover {
+  color: var(--color-danger);
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive — small screens: content-grid stacks vertically
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 var(--spacing-md);
+    height: auto;
+    min-height: var(--header-height);
+    flex-wrap: wrap;
+    padding-top: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    gap: var(--spacing-sm);
+  }
+
+  .app-title {
+    font-size: 1.05rem;
+  }
+
+  .balance-amount {
+    font-size: 1.125rem;
+  }
+
+  .app-main {
+    padding: var(--spacing-md);
+    gap: var(--spacing-lg);
+  }
+
+  .expense-form {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-submit {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Stack list and chart vertically on small screens */
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+
+  .transaction-list-container {
+    height: 300px;
+  }
+
+  .notification-container {
+    right: var(--spacing-md);
+    left: var(--spacing-md);
+    max-width: none;
+    width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .form-section,
+  .list-section,
+  .chart-section {
+    padding: var(--spacing-md);
+  }
+
+  .transaction-list-container {
+    height: 260px;
+  }
+}

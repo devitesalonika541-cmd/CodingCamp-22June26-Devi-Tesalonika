@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense &amp; Budget Visualizer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Balance Display — selalu terlihat di bagian atas halaman -->
+  <header class="app-header">
+    <h1 class="app-title">Expense &amp; Budget Visualizer</h1>
+    <div class="header-controls">
+      <div id="balance-display" class="balance-display">
+        <span class="balance-label">Total Pengeluaran</span>
+        <span class="balance-amount">Rp 0.00</span>
+      </div>
+      <button id="btn-theme-toggle" class="btn-icon" aria-label="Toggle dark mode" title="Toggle dark/light mode">
+        <span class="icon-sun" aria-hidden="true">☀️</span>
+        <span class="icon-moon" aria-hidden="true">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- Input Form -->
+    <section class="form-section" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="section-title">Tambah Pengeluaran</h2>
+      <form id="expense-form" class="expense-form" novalidate>
+        <div class="form-group">
+          <label for="input-name">Nama Item</label>
+          <input
+            type="text"
+            id="input-name"
+            name="name"
+            maxlength="100"
+            placeholder="Contoh: Makan siang"
+            autocomplete="off"
+          />
+          <span class="field-error" id="error-name" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-amount">Jumlah (Rp)</label>
+          <input
+            type="number"
+            id="input-amount"
+            name="amount"
+            min="0.01"
+            max="999999999.99"
+            step="0.01"
+            placeholder="Contoh: 25000"
+          />
+          <span class="field-error" id="error-amount" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-category">Kategori</label>
+          <select id="input-category" name="category">
+            <option value="" disabled selected>-- Pilih Kategori --</option>
+            <option value="Food">Food</option>
+            <option value="Transport">Transport</option>
+            <option value="Fun">Fun</option>
+          </select>
+          <span class="field-error" id="error-category" aria-live="polite"></span>
+        </div>
+
+        <button type="submit" class="btn-submit">Tambah Transaksi</button>
+      </form>
+
+      <!-- Custom Category Manager -->
+      <div class="category-manager" id="category-manager">
+        <button type="button" class="btn-manage-categories" id="btn-toggle-categories" aria-expanded="false" aria-controls="category-panel">
+          ＋ Kelola Kategori
+        </button>
+        <div class="category-panel" id="category-panel" hidden>
+          <div class="category-panel-body">
+            <div class="category-add-row">
+              <input type="text" id="input-new-category" maxlength="30" placeholder="Nama kategori baru…" autocomplete="off" aria-label="Nama kategori baru" />
+              <button type="button" class="btn-add-category" id="btn-add-category">Tambah</button>
+            </div>
+            <span class="field-error" id="error-new-category" aria-live="polite"></span>
+            <ul id="category-list" class="category-list" aria-label="Daftar kategori"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="content-grid">
+
+      <!-- Transaction List -->
+      <section class="list-section" aria-labelledby="list-heading">
+        <div class="list-section-header">
+          <h2 id="list-heading" class="section-title">Riwayat Transaksi</h2>
+          <div class="sort-controls">
+            <label for="sort-select" class="sort-label">Urutkan:</label>
+            <select id="sort-select" class="sort-select" aria-label="Urutkan transaksi">
+              <option value="date-desc">Terbaru</option>
+              <option value="date-asc">Terlama</option>
+              <option value="amount-desc">Jumlah ↓</option>
+              <option value="amount-asc">Jumlah ↑</option>
+              <option value="category-asc">Kategori A–Z</option>
+            </select>
+          </div>
+        </div>
+        <div class="transaction-list-container">
+          <ul id="transaction-list" class="transaction-list" aria-label="Daftar transaksi">
+            <!-- Transaksi dirender oleh app.js -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- Chart Section -->
+      <section class="chart-section" aria-labelledby="chart-heading">
+        <h2 id="chart-heading" class="section-title">Distribusi Pengeluaran</h2>
+        <div class="chart-container">
+          <canvas id="expense-chart" aria-label="Pie chart distribusi pengeluaran per kategori" role="img"></canvas>
+          <p id="chart-placeholder" class="chart-placeholder" aria-live="polite"></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Toast Notification Container -->
+  <div id="notification-container" class="notification-container" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- App Script -->
+  <script src="app.js"></script>
+
+</body>
+</html>
